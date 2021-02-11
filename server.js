@@ -40,6 +40,25 @@ server.get('/api/users/:id', (req, res) => {
     }
 });
 
+// In case only provide "name", asking for required "bio" as well
+server.put('/api/users/:id', (req, res) => {
+    if (!req.body.name || !req.body.bio) {
+        res
+            .status(400)
+            .json({ errorMessage: 'Please provide name and bio for this user.'})
+    }
+
+    const user = db.updateUser(req.params.id, req.body);
+
+    if (user) {
+        res.json(user);
+    } else {
+        res.status(404).json(
+            { message: 'The user with the specified ID does not exist.'}
+        )
+    }
+})
+
 // delete User by ID
 server.delete("/api/users/:id", (req, res) => {
     // make sure the user exists before trying to update it
@@ -62,25 +81,7 @@ server.delete("/api/users/:id", (req, res) => {
     }
 })
 
-// In case only provide "name", asking for required "bio" as well
-server.put('/api/users/:id', (req, res) => {
-    if (!req.body.name || !req.body.bio) {
-        res
-            .status(400)
-            .json({ errorMessage: 'Please provide name and bio for this user.'})
-    }
-
-    const user = db.updateUser(req.params.id, req.body);
-
-    if (user) {
-        res.json(user);
-    } else {
-        res.status(404).json(
-            { message: 'The user with the specified ID does not exist.'}
-        )
-    }
-})
-
+// Server listening at port 8080
 server.listen(8080, () => {
     console.log('server started')
 })
